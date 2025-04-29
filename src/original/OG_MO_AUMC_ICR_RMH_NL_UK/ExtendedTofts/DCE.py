@@ -98,7 +98,11 @@ def fit_tofts_model(Ct, t, aif, idxs=None, X0 = (0.6, 1, 0.03, 0.0025), bounds =
     :param bounds: fit boundaries for  ke, dt, ve, vp
     :return output: matrix with EXtended Tofts parameters per voxel: ke,dt,ve,vp
     '''
-    N, ndyn = Ct.shape
+    try:
+        N, ndyn = Ct.shape
+    except:
+        Ct = Ct[np.newaxis, ...]
+        N, ndyn = Ct.shape
     if idxs is None:
         idxs = range(N)
     if model=='Cosine4':
@@ -305,7 +309,7 @@ def R1_two_fas(images, flip_angles, TR):
                 print(j)
     return (R1map)
 
-def R1_VFA(images, flip_angles, TR,jobs=4,bounds=((0,0),(np.Inf,10))):
+def R1_VFA(images, flip_angles, TR,jobs=4,bounds=((0,0),(np.inf,10))):
     ''' Create T1 map from multiflip images '''
     inshape = images.shape
     nangles = inshape[-1]
@@ -321,7 +325,7 @@ def R1_VFA(images, flip_angles, TR,jobs=4,bounds=((0,0),(np.Inf,10))):
     X0=[5,1]
     idxs = range(inshape[0])
     print('fitting ' + str(inshape[0]) + ' voxels')
-    if np.ndim(images) is 1:
+    if np.ndim(images) == 1:
         output, pcov = curve_fit(fit_func, flip_angles, images, p0=X0,bounds=bounds)
         return output[1]
     else:
